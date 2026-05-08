@@ -18,6 +18,12 @@ jobs:
     
     runs-on: ubuntu-latest
     
+    container:
+      image: ghcr.io/maheshz/fixium:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,8 +32,20 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 0
       
-      - name: Run Fixium Code Review (Docker)
+      - name: Run Fixium Code Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          BOBSHELL_API_KEY: ${{ secrets.BOBSHELL_API_KEY }}
+          FIXIUM_AUTHORIZED_USERS: ${{ secrets.FIXIUM_AUTHORIZED_USERS }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_USER: ${{ github.event.comment.user.login }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
         run: |
+<<<<<<< test_review
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
             -w /workspace \
@@ -42,6 +60,10 @@ jobs:
             -e COMMENT_USER="${{ github.event.comment.user.login }}" \
             -e GITHUB_WORKSPACE="/workspace" \
             ghcr.io/maheshz/fixium:latest
+=======
+          # The Fixium container's entrypoint will handle the review
+          /app/review.sh
+>>>>>>> main
       
       - name: Upload review artifacts
         if: always()
