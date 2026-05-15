@@ -15,6 +15,15 @@ from schemas import FlightOut, BookingOut, UserOut, ErrorResponse, BookingReques
 # Load environment variables from .env file
 load_dotenv()
 
+# ==================== TIMEOUT CONSTANTS ====================
+# Timeout values for Java service proxy endpoints
+QUOTE_CREATE_TIMEOUT = 45.0  # Standard timeout for quote creation
+QUOTE_GET_TIMEOUT = 60.0  # Standard timeout for quote retrieval
+HOLD_CREATE_TIMEOUT = 90.0  # Extended timeout for hold creation (inventory check)
+HOLD_RETRIEVAL_TIMEOUT = 120.0  # Extended time for hold status checks and data assembly
+HOLD_CONFIRM_TIMEOUT = 30.0  # Standard timeout for hold confirmation
+HOLD_RELEASE_TIMEOUT = 30.0  # Standard timeout for hold release
+
 
 # ==================== MCP SERVER (for AI agents) ====================
 # NOTE: MCP server must be created before FastAPI app to properly combine lifespans
@@ -305,7 +314,7 @@ async def create_quote(quote_data: dict):
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes",
                 json=quote_data,
-                timeout=45.0
+                timeout=QUOTE_CREATE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -320,7 +329,7 @@ async def get_quote(quote_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}",
-                timeout=60.0
+                timeout=QUOTE_GET_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -335,7 +344,7 @@ async def create_hold(quote_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}/holds",
-                timeout=90.0
+                timeout=HOLD_CREATE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -350,7 +359,7 @@ async def get_hold(hold_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}",
-                timeout=120.0
+                timeout=HOLD_RETRIEVAL_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -365,7 +374,7 @@ async def confirm_hold(hold_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}/confirm",
-                timeout=30.0
+                timeout=HOLD_CONFIRM_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -380,7 +389,7 @@ async def release_hold(hold_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}/release",
-                timeout=30.0
+                timeout=HOLD_RELEASE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
