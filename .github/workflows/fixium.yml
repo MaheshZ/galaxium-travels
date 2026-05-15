@@ -33,37 +33,12 @@ jobs:
       packages: read
     
     steps:
-      - name: Get PR details
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          script: |
-            let pr;
-            if (context.eventName === 'pull_request_review_comment') {
-              // For review comments, get PR from the comment
-              const prNumber = context.payload.pull_request.number;
-              const result = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber
-              });
-              pr = result.data;
-            } else {
-              // For issue comments
-              pr = context.payload.issue || context.payload.pull_request;
-            }
-            core.setOutput('head_ref', pr.head.ref);
-            core.setOutput('head_repo', pr.head.repo.full_name);
-            core.setOutput('number', pr.number);
-      
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Checkout the actual PR branch (not detached HEAD) to allow pushing commits
-          repository: ${{ steps.pr.outputs.head_repo }}
-          ref: ${{ steps.pr.outputs.head_ref }}
+          # Fetch the PR branch - script will handle detached HEAD
+          ref: refs/pull/${{ github.event.pull_request.number || github.event.issue.number }}/head
           fetch-depth: 0
-          # Use a token with write permissions
           token: ${{ secrets.MY_GITHUB_TOKEN }}
       
       - name: Log in to GitHub Container Registry
