@@ -275,6 +275,14 @@ def get_user_endpoint(name: str, email: str, db: Session = Depends(get_db)):
 
 JAVA_SERVICE_URL = os.getenv("JAVA_SERVICE_URL", "http://localhost:8080")
 
+# Timeout constants for Java service proxy endpoints
+QUOTE_CREATE_TIMEOUT = 45.0
+QUOTE_GET_TIMEOUT = 60.0
+HOLD_CREATE_TIMEOUT = 90.0
+HOLD_GET_TIMEOUT = 120.0
+HOLD_CONFIRM_TIMEOUT = 30.0
+HOLD_RELEASE_TIMEOUT = 30.0
+
 
 @app.post("/internal/bookings/from-hold", response_model=BookingOut, tags=["Internal"])
 def create_booking_from_hold(hold_data: dict, db: Session = Depends(get_db)):
@@ -305,7 +313,7 @@ async def create_quote(quote_data: dict):
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes",
                 json=quote_data,
-                timeout=45.0
+                timeout=QUOTE_CREATE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -320,7 +328,7 @@ async def get_quote(quote_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}",
-                timeout=60.0
+                timeout=QUOTE_GET_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -335,7 +343,7 @@ async def create_hold(quote_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}/holds",
-                timeout=90.0
+                timeout=HOLD_CREATE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -350,7 +358,7 @@ async def get_hold(hold_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}",
-                timeout=120.0
+                timeout=HOLD_GET_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -365,7 +373,7 @@ async def confirm_hold(hold_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}/confirm",
-                timeout=30.0
+                timeout=HOLD_CONFIRM_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
@@ -380,7 +388,7 @@ async def release_hold(hold_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}/release",
-                timeout=30.0
+                timeout=HOLD_RELEASE_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
