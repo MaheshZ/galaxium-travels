@@ -305,7 +305,7 @@ async def create_quote(quote_data: dict):
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes",
                 json=quote_data,
-                timeout=30.0
+                timeout=40.0
             )
             response.raise_for_status()
             return response.json()
@@ -320,7 +320,7 @@ async def get_quote(quote_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}",
-                timeout=30.0
+                timeout=80.0
             )
             response.raise_for_status()
             return response.json()
@@ -335,7 +335,7 @@ async def create_hold(quote_id: str):
         try:
             response = await client.post(
                 f"{JAVA_SERVICE_URL}/api/v1/quotes/{quote_id}/holds",
-                timeout=30.0
+                timeout=90.0
             )
             response.raise_for_status()
             return response.json()
