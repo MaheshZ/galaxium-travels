@@ -11,15 +11,18 @@ concurrency:
 
 jobs:
   fixium-review:
-    # Only run on PR comments that contain "Fixium:review"
+    # Only run on PR comments that contain supported Fixium commands
     if: |
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, 'Fixium:review')
+      (
+        contains(github.event.comment.body, 'Fixium:review') ||
+        contains(github.event.comment.body, 'Fixium:implement')
+      )
     
     runs-on: ubuntu-latest
     
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       packages: read
     
@@ -46,6 +49,8 @@ jobs:
             -e GITHUB_OWNER="${{ github.repository_owner }}" \
             -e GITHUB_REPO="${{ github.event.repository.name }}" \
             -e PR_NUMBER="${{ github.event.issue.number }}" \
+            -e COMMENT_ID="${{ github.event.comment.id }}" \
+            -e REPLY_TO_COMMENT_ID="${{ github.event.comment.in_reply_to_id }}" \
             -e COMMENT_BODY="${{ github.event.comment.body }}" \
             -e COMMENT_USER="${{ github.event.comment.user.login }}" \
             -e GITHUB_WORKSPACE="/workspace" \
