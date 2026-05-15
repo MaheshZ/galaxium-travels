@@ -15,6 +15,14 @@ from schemas import FlightOut, BookingOut, UserOut, ErrorResponse, BookingReques
 # Load environment variables from .env file
 load_dotenv()
 
+# ==================== TIMEOUT CONSTANTS ====================
+# Timeout for retrieving hold details from Java service
+# This operation may take longer than others because:
+# - It queries the hold state which may involve database lookups
+# - It validates hold expiration and performs cleanup if needed
+# - Network latency to Java service can be higher for complex queries
+HOLD_GET_TIMEOUT = 120.0
+
 
 # ==================== MCP SERVER (for AI agents) ====================
 # NOTE: MCP server must be created before FastAPI app to properly combine lifespans
@@ -350,7 +358,7 @@ async def get_hold(hold_id: str):
         try:
             response = await client.get(
                 f"{JAVA_SERVICE_URL}/api/v1/holds/{hold_id}",
-                timeout=120.0
+                timeout=HOLD_GET_TIMEOUT
             )
             response.raise_for_status()
             return response.json()
