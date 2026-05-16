@@ -127,6 +127,41 @@ Once started, access:
 - **[docs/](docs/)** - All other documentation (implementation ideas, migration plans, etc.)
 - **[scripts/](scripts/)** - Operational scripts organized by deployment target
 
+## 🤖 Fixium Code Review Bot
+
+This repository includes an automated code review workflow powered by Fixium, an AI-native code review assistant.
+
+### How to Trigger a Review
+
+1. **Create a Pull Request** - Open a PR from your feature branch to `main`
+2. **Request Review** - Add a comment on the PR containing: `Fixium:review`
+3. **Wait for Analysis** - The workflow will automatically:
+   - Checkout your PR branch
+   - Analyze the code changes
+   - Post detailed review comments
+   - Upload review artifacts
+
+### Review Features
+
+- **Automated Analysis** - AI-powered code review on every PR
+- **Detailed Feedback** - Line-by-line comments on potential issues
+- **Best Practices** - Suggestions for code quality improvements
+- **Security Checks** - Identification of potential security vulnerabilities
+- **Performance Tips** - Recommendations for optimization
+
+### Configuration
+
+The workflow is defined in `.github/workflows/fixium.yml` and requires:
+- `MY_GITHUB_TOKEN` - GitHub API access token
+- `BOBSHELL_API_KEY` - Fixium API key
+- `FIXIUM_AUTHORIZED_USERS` - List of users authorized to trigger reviews
+
+### Review Artifacts
+
+After each review, artifacts are uploaded to GitHub Actions:
+- `fixium-review-{PR_NUMBER}.json` - Complete review data
+- Retained for 30 days for audit purposes
+
 ## 🎯 User Guide
 
 ### Booking a Flight

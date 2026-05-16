@@ -62,6 +62,8 @@ jobs:
             -e COMMENT_USER="${{ github.event.comment.user.login }}" \
             -e GITHUB_WORKSPACE="/workspace" \
             ghcr.io/maheshz/fixium:latest
+          # The Fixium container's entrypoint will handle the review
+          /app/review.sh
       
       - name: Upload review artifacts
         if: always()
